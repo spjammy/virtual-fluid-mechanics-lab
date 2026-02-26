@@ -22,10 +22,10 @@ export default function IntroPage() {
                         <div className="action-section-top">
                             <div className="start-buttons">
                                 <button className="start-btn explore-btn" onClick={() => navigate('/experiment', { state: { startMode: 'explore' } })}>
-                                    🔎 Find the Apparatus
+                                    Find the Apparatus
                                 </button>
                                 <button className="start-btn" onClick={() => navigate('/experiment', { state: { startMode: 'experiment' } })}>
-                                    Start Experiment 🚀
+                                    Start Experiment
                                 </button>
                             </div>
                         </div>

@@ -57,18 +57,18 @@ export default function UIOverlay({ state, setters }) {
         switch (step) {
             case 0:
                 if (foundComponents.length < 9) return { text: `Find all parts of the apparatus listed in the sidebar. Found: ${foundComponents.length} / 9`, btn: "Find Components", disabled: true };
-                return { text: "All 9 components identified!", btn: "Return to Main Menu 🏠", disabled: false };
-            case 1: return { text: "Turn on the Pump to fill the overhead tank.", btn: "🔌 Start Pump", disabled: false };
-            case 2: return { text: "Open the valve to let water flow through the pipe.", btn: "🔧 Open Valve", disabled: false };
+                return { text: "All 9 components identified!", btn: "Return to Main Menu", disabled: false };
+            case 1: return { text: "Turn on the Pump to fill the overhead tank.", btn: "Start Pump", disabled: false };
+            case 2: return { text: "Open the valve to let water flow through the pipe.", btn: "Open Valve", disabled: false };
             case 3:
-                if (stabRemaining > 0) return { text: "Waiting for flow to stabilise…", btn: `⏳ Stabilising…`, disabled: true };
-                return { text: "Flow stabilised! Ready to inject dye.", btn: "✅ Continue", disabled: false };
-            case 4: return { text: "Inject dye into the stream to observe the flow regime.", btn: "💉 Inject Dye", disabled: false };
+                if (stabRemaining > 0) return { text: "Waiting for flow to stabilise…", btn: `Stabilising…`, disabled: true };
+                return { text: "Flow stabilised! Ready to inject dye.", btn: "Continue", disabled: false };
+            case 4: return { text: "Inject dye into the stream to observe the flow regime.", btn: "Inject Dye", disabled: false };
             case 5:
-                if (collecting) return { text: "Collecting water... Wait a few seconds for an accurate sample.", btn: "⏹ Stop Collection", disabled: false };
+                if (collecting) return { text: "Collecting water... Wait a few seconds for an accurate sample.", btn: "Stop Collection", disabled: false };
                 if (collectStartTs > 0) return { text: "Collection complete. Validating results...", btn: "Next", disabled: false };
-                return { text: "Start timing the flow to calculate the volumetric flow rate.", btn: "⏱ Start Collection", disabled: false };
-            case 6: return { text: "Review the results of this run.", btn: currentRunNum < targetRuns ? "Next Run ➔" : "Finish Experiment 🏁", disabled: false };
+                return { text: "Start timing the flow to calculate the volumetric flow rate.", btn: "Start Collection", disabled: false };
+            case 6: return { text: "Review the results of this run.", btn: currentRunNum < targetRuns ? "Next Run ->" : "Finish Experiment", disabled: false };
             default: return { text: "", btn: "", disabled: true };
         }
     };
@@ -89,16 +89,16 @@ export default function UIOverlay({ state, setters }) {
             <Draggable nodeRef={nodeRef} handle=".results-drag-handle">
                 <div ref={nodeRef} className="results-panel">
                     <div className="results-drag-handle">
-                        ⋮⋮ Drag to move
+                        Drag to move
                     </div>
                     <h2 style={{ color: regimeColor }}>{resultRegime} Flow</h2>
                     <span className="re-badge" style={{ color: regimeColor }}>Re = {Math.round(resultRe)}</span>
                     <table>
                         <tbody>
-                            <tr><td>⏱️ Collection Time</td><td><strong>{resultElapsed.toFixed(2)} s</strong></td></tr>
-                            <tr><td>💧 Collected Volume</td><td><strong>{(collectedVolume * 1000).toFixed(3)} L</strong></td></tr>
-                            <tr><td>📌 Pipe Diameter</td><td><strong>{(diameter * 1000).toFixed(1)} mm</strong></td></tr>
-                            <tr><td>🌊 Measured Velocity</td><td><strong>{(collectedVolume / resultElapsed / (Math.PI * Math.pow(diameter / 2, 2))).toFixed(3)} m/s</strong></td></tr>
+                            <tr><td>Collection Time</td><td><strong>{resultElapsed.toFixed(2)} s</strong></td></tr>
+                            <tr><td>Collected Volume</td><td><strong>{(collectedVolume * 1000).toFixed(3)} L</strong></td></tr>
+                            <tr><td>Pipe Diameter</td><td><strong>{(diameter * 1000).toFixed(1)} mm</strong></td></tr>
+                            <tr><td>Measured Velocity</td><td><strong>{(collectedVolume / resultElapsed / (Math.PI * Math.pow(diameter / 2, 2))).toFixed(3)} m/s</strong></td></tr>
                         </tbody>
                     </table>
                     <p style={{ margin: "12px 0 0", fontSize: "0.85em", color: "rgba(180,210,255,0.75)" }}>{descs[resultRegime]}</p>
@@ -109,11 +109,11 @@ export default function UIOverlay({ state, setters }) {
                             style={{ background: 'linear-gradient(135deg, #238636, #2ea043)', color: '#fff', border: 'none' }}
                             onClick={() => navigate('/results', { state: { history: experimentHistory } })}
                         >
-                            📊 Finish & View Results
+                            Finish & View Results
                         </button>
                     ) : (
                         <button className="restart-btn" onClick={() => resetExperiment(false)}>
-                            ▶️ Start Run {currentRunNum} of {targetRuns}
+                            Start Run {currentRunNum} of {targetRuns}
                         </button>
                     )}
                 </div>
@@ -140,7 +140,7 @@ export default function UIOverlay({ state, setters }) {
             {/* Floating button to reopen sidebar when collapsed */}
             {!sidebarOpen && (
                 <button className="sidebar-open-fab" onClick={() => setSidebarOpen(true)} title="Open settings">
-                    ⚙️
+                    Settings
                 </button>
             )}
 
@@ -150,12 +150,12 @@ export default function UIOverlay({ state, setters }) {
                     onClick={() => setSidebarOpen(o => !o)}
                     title={sidebarOpen ? 'Collapse settings' : 'Open settings'}
                 >
-                    {sidebarOpen ? '✕' : '⚙️'}
+                    {sidebarOpen ? '✕' : 'Settings'}
                 </button>
 
                 {step === 0 ? (
                     <>
-                        <h2>🔎 Find Components</h2>
+                        <h2>Find Components</h2>
                         <p style={{ color: "#8b949e", fontSize: "0.95em", marginBottom: "1.5rem" }}>
                             Click on the 3D apparatus to identify the following components:
                         </p>
@@ -173,7 +173,7 @@ export default function UIOverlay({ state, setters }) {
                                         fontSize: "1.2em",
                                         opacity: foundComponents.includes(comp) ? 1 : 0.4
                                     }}>
-                                        {foundComponents.includes(comp) ? "✅" : "🔲"}
+                                        {foundComponents.includes(comp) ? "[x]" : "[ ]"}
                                     </span>
                                     <span style={{
                                         fontWeight: foundComponents.includes(comp) ? "bold" : "normal",
@@ -188,7 +188,7 @@ export default function UIOverlay({ state, setters }) {
                     </>
                 ) : (
                     <>
-                        <h2>⚙️ Apparatus Settings</h2>
+                        <h2>Apparatus Settings</h2>
                         <div className="control-group">
                             <label>Pipe Diameter: {(diameter * 1000).toFixed(1)} mm</label>
                             <input type="range" min="0.01" max="0.05" step="0.001" value={diameter} onChange={e => setDiameter(parseFloat(e.target.value))} disabled={step > 2} />
@@ -211,7 +211,7 @@ export default function UIOverlay({ state, setters }) {
                             Density: {FLUID_DATABASE[fluidName].rho} kg/m³<br />
                             Viscosity: {FLUID_DATABASE[fluidName].mu} Pa·s
                         </div>
-                        <button style={{ marginTop: 15, width: "100%" }} onClick={() => resetExperiment(true)}>🔄 Reset All Progress</button>
+                        <button style={{ marginTop: 15, width: "100%" }} onClick={() => resetExperiment(true)}>Reset All Progress</button>
                     </>
                 )}
             </div>
@@ -233,7 +233,7 @@ export default function UIOverlay({ state, setters }) {
                     )}
                     {step === 5 && collectStartTs > 0 && (
                         <div style={{ fontSize: 13, marginRight: 15 }}>
-                            ⏱ {colElapsed.toFixed(1)} s | 💧 {(flowRateM3s * colElapsed * 1000).toFixed(3)} L
+                            {colElapsed.toFixed(1)} s | {(flowRateM3s * colElapsed * 1000).toFixed(3)} L
                         </div>
                     )}
 
@@ -245,7 +245,7 @@ export default function UIOverlay({ state, setters }) {
 
                     {step === 6 && (
                         <button className="action-btn" onClick={() => setShowResults(!showResults)}>
-                            {showResults ? "👁️ Hide Results" : "📊 Show Results"}
+                            {showResults ? "Hide Results" : "Show Results"}
                         </button>
                     )}
                 </div>

@@ -31,7 +31,7 @@ export default function MobileRotateOverlay() {
                 display: "inline-block",
                 transformOrigin: "center",
             }}>
-                📱
+                [ ]
             </div>
 
             <h2 style={{
@@ -63,9 +63,9 @@ export default function MobileRotateOverlay() {
                 fontSize: "0.85rem",
                 color: "#8b949e",
             }}>
-                <span>↕️ Portrait</span>
-                <span style={{ fontSize: "1.2rem" }}>→</span>
-                <span>↔️ Landscape</span>
+                <span>Portrait</span>
+                <span style={{ fontSize: "1.2rem" }}>-&gt;</span>
+                <span>Landscape</span>
             </div>
 
             <style>{`

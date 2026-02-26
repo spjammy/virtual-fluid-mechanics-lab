@@ -67,7 +67,7 @@ export default function ResultsPage() {
 
                 <div className="results-actions">
                     <button className="restart-btn" onClick={() => navigate('/')}>
-                        🔄 Start New Session
+                        Start New Session
                     </button>
                 </div>
             </main>
