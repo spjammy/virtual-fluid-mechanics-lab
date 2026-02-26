@@ -1,0 +1,126 @@
+.results-container {
+    height: 100vh;
+    width: 100vw;
+    overflow-y: auto;
+    background-color: #0d1117;
+    color: #e6edf3;
+    font-family: 'Inter', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+.results-header {
+    background: linear-gradient(135deg, #1f2937 0%, #0d1117 100%);
+    border-bottom: 1px solid #30363d;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.results-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(to right, #79c0ff, #2f81f7);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.results-header p {
+    color: #8b949e;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.results-main {
+    flex: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.table-wrapper {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.results-table th,
+.results-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #30363d;
+}
+
+.results-table th {
+    background: #21262d;
+    color: #c9d1d9;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.results-table tr:last-child td {
+    border-bottom: none;
+}
+
+.results-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.results-table tbody tr:hover {
+    background-color: #1f2428;
+}
+
+.re-cell {
+    font-family: 'Fira Code', monospace;
+    font-weight: 600;
+    color: #79c0ff;
+}
+
+.regime-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.results-actions {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.restart-btn {
+    background: linear-gradient(135deg, #238636, #2ea043);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(46, 160, 67, 0.4);
+}
+
+.restart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 160, 67, 0.6);
+}
+
+.restart-btn:active {
+    transform: translateY(0);
+}
