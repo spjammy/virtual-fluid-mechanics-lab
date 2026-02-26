@@ -14,7 +14,9 @@ export default function DyeFilament({
 
     const maxPoints = 400; // Dense enough for high frequency wave
     const maxInstances = maxPoints - 1;
-    const flowSpeed = velocity * 0.06;
+    const baseFlowSpeed = velocity * 0.06;
+    // Laminar dye is injected faster visually — it travels cleanly so the speed is very apparent
+    const flowSpeed = regime === "Laminar" ? baseFlowSpeed * 5.0 : baseFlowSpeed;
     const radiusMax = diameter * 15 - 0.05;
 
     const dyeColHex = 0xff2200;
@@ -24,6 +26,8 @@ export default function DyeFilament({
 
     const instancedMeshRef = useRef();
     const activeCountRef = useRef(1); // How many points are "alive" and moving
+    // Vertical velocity per-point for projectile fall after pipe exit
+    const vysRef = useRef(new Float32Array(maxPoints));
 
     // Static objects for matrix maths inside useFrame to avoid GC pauses
     const { dummy, vec, up } = useMemo(() => ({
@@ -51,10 +55,11 @@ export default function DyeFilament({
         }
     }, [dyeActive, dyeTipX, pipeY, maxPoints]);
 
-    useFrame(() => {
+    useFrame((_, delta) => {
         if (!dyeActive || !instancedMeshRef.current) return;
 
         const positions = positionsRef.current;
+        const vys = vysRef.current;
 
         // Spawn more points proportionally so they precisely cover the pipe length
         if (activeCountRef.current < maxPoints) {
@@ -76,11 +81,31 @@ export default function DyeFilament({
             wavinessLength = pipeLength * 0.4;
         }
 
+        const gravity = 9.8;
+        const shootVelocityX = flowSpeed * 18.0; // Horizontal exit speed matching WaterFlow
+        const sumpFloor = -3.5;
+
         // 1. Move all points along X axis and compute physical positions
         for (let i = 0; i < currentCount; i++) {
             const p = positions[i];
-            p.x += flowSpeed;
 
+            // --- FALLING PHASE: point has exited the pipe ---
+            if (p.x >= pipeEndX) {
+                // Apply gravity to vertical velocity
+                vys[i] -= gravity * delta;
+                p.x += shootVelocityX * delta;
+                p.y += vys[i] * delta;
+
+                // Reset to tip once it hits the sump floor
+                if (p.y < sumpFloor) {
+                    p.set(dyeTipX, pipeY, 0);
+                    vys[i] = 0;
+                }
+                continue;
+            }
+
+            // --- PIPE PHASE: normal horizontal flow ---
+            p.x += flowSpeed;
             const relativeX = p.x - dyeTipX;
 
             if (relativeX <= laminarLength) {
@@ -91,7 +116,6 @@ export default function DyeFilament({
                 // Wavy / Transitional Phase
                 let progress = (relativeX - laminarLength) / Math.max(wavinessLength, 0.01);
                 progress = Math.min(progress, 1.0);
-                // Make wave amplitude highly visible
                 const waveAmp = progress * (radiusMax * 0.85);
 
                 const t = Date.now() / 200;
@@ -105,22 +129,22 @@ export default function DyeFilament({
                 p.z += (Math.random() - 0.5) * baseTurbFactor;
 
                 const distToCenter = Math.sqrt(Math.pow(p.y - pipeY, 2) + Math.pow(p.z, 2));
-
                 if (distToCenter > radiusMax) {
                     p.y = pipeY;
                     p.z = 0;
                 }
             }
 
-            // Wrap around seamlessly
-            if (p.x > pipeEndX) {
-                p.set(dyeTipX, pipeY, 0);
+            // Point just reached the pipe exit — initialise its fall velocity
+            if (p.x >= pipeEndX) {
+                vys[i] = 0; // Start falling from rest in Y
             }
         }
 
         // 2. Keep the un-spawned points anchored at the tip
         for (let i = currentCount; i < maxPoints; i++) {
             positions[i].set(dyeTipX, pipeY, 0);
+            vys[i] = 0;
         }
 
         // 3. Construct the continuous thick line using overlapping Cylinders
@@ -129,7 +153,7 @@ export default function DyeFilament({
             const p1 = positions[i];
             const p2 = positions[i + 1];
 
-            // If a segment jumps backward (reset to tip), or hasn't spawned yet, hide it entirely
+            // Hide segment if it jumps backward (wrap reset) or hasn't spawned yet
             if (p1.x < p2.x || i >= currentCount - 1) {
                 dummy.scale.set(0, 0, 0);
                 dummy.updateMatrix();
@@ -138,25 +162,23 @@ export default function DyeFilament({
             }
 
             const dist = p1.distanceTo(p2);
-            dummy.position.copy(p1).lerp(p2, 0.5); // Center between p1 and p2
-            vec.subVectors(p2, p1).normalize();    // Direction vector
+            dummy.position.copy(p1).lerp(p2, 0.5);
+            vec.subVectors(p2, p1).normalize();
 
-            // Set rotation avoiding 0-length vectors
             if (vec.lengthSq() > 0.00001) {
                 dummy.quaternion.setFromUnitVectors(up, vec);
             } else {
                 dummy.quaternion.identity();
             }
 
-            // Overlap slightly by scaling 1.05 so segments joints never crack
             dummy.scale.set(dyeThickness, dist * 1.05, dyeThickness);
-
             dummy.updateMatrix();
             instancedMeshRef.current.setMatrixAt(i, dummy.matrix);
         }
 
         instancedMeshRef.current.instanceMatrix.needsUpdate = true;
     });
+
 
     if (!dyeActive) return null;
 
